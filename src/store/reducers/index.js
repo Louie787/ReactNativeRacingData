@@ -1,6 +1,8 @@
 import {combineReducers} from 'redux';
-import appReducer from './app';
+import drivers from './drivers';
+import results from './results';
 
 export default combineReducers({
-  appReducer,
+  drivers,
+  results,
 });

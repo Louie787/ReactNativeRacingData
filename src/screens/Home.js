@@ -4,26 +4,26 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {Loader} from '../components/Loader';
 import {DriversListItem} from '../components/DriversListItem';
-import {getDrivers, limit} from '../store/actions/app';
 import {EmptyContent} from '../components/EmptyContent';
-import {CHANGE_LOADER, CHANGE_OFFSET} from '../store/types';
+import {CHANGE_DRIVERS_OFFSET} from '../store/types';
+import {driversLimit} from '../fetches';
+import {getDrivers} from '../store/actions/drivers';
 
-export const Home = ({navigation}) => {
+export function Home({navigation}) {
   const dispatch = useDispatch();
-  const isLoading = useSelector((state) => state.appReducer.isLoading);
+  const isLoading = useSelector((state) => state.drivers.isLoading);
   const [refreshing, setRefreshing] = useState(false);
-  const offset = useSelector((state) => state.appReducer.offset);
-  const drivers = useSelector((state) => state.appReducer.drivers);
+  const offset = useSelector((state) => state.drivers.driversOffset);
+  const drivers = useSelector((state) => state.drivers.drivers);
 
   useEffect(() => {
-    dispatch({type: CHANGE_LOADER, payload: true});
     dispatch(getDrivers(offset));
     setRefreshing(false);
   }, [refreshing]);
 
   return (
     <View style={styles.container}>
-      {isLoading ? (
+      {isLoading && offset === 0 ? (
         <Loader />
       ) : (
         <FlatList
@@ -31,7 +31,7 @@ export const Home = ({navigation}) => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => {
-                dispatch({type: CHANGE_OFFSET, payload: 0});
+                dispatch({type: CHANGE_DRIVERS_OFFSET, payload: 0});
                 setRefreshing(true);
               }}
             />
@@ -48,15 +48,21 @@ export const Home = ({navigation}) => {
             />
           )}
           keyExtractor={(item, index) => item.driverId + index}
-          onEndReached={() => dispatch(getDrivers(offset + limit))}
+          onEndReached={() => {
+            dispatch({
+              type: CHANGE_DRIVERS_OFFSET,
+              payload: offset + driversLimit,
+            });
+            dispatch(getDrivers(offset));
+          }}
           onEndReachedThreshold={0.1}
           ListEmptyComponent={<EmptyContent />}
-          ListFooterComponent={<Loader />}
+          ListFooterComponent={() => (isLoading ? <Loader /> : null)}
         />
       )}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
