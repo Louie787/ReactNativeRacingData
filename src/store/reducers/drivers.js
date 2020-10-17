@@ -4,12 +4,14 @@ import {
   GET_DRIVERS,
   CHANGE_DRIVERS_OFFSET,
   REFRESH_DRIVERS,
+  SET_ERROR,
 } from '../types';
 
 const initialState = {
   isLoading: true,
   driversOffset: 0,
   drivers: [],
+  error: false,
 };
 
 export default function drivers(state = initialState, {type, payload}) {
@@ -38,6 +40,11 @@ export default function drivers(state = initialState, {type, payload}) {
       return {
         ...state,
         drivers: payload,
+      };
+    case SET_ERROR:
+      return {
+        ...state,
+        error: payload,
       };
     default:
       return state;

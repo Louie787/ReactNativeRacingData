@@ -15,6 +15,7 @@ export function Home({navigation}) {
   const [refreshing, setRefreshing] = useState(false);
   const offset = useSelector((state) => state.drivers.driversOffset);
   const drivers = useSelector((state) => state.drivers.drivers);
+  const error = useSelector((state) => state.drivers.error);
 
   useEffect(() => {
     dispatch(getDrivers(offset));
@@ -25,6 +26,8 @@ export function Home({navigation}) {
     <View style={styles.container}>
       {isLoading && offset === 0 ? (
         <Loader />
+      ) : error ? (
+        <EmptyContent />
       ) : (
         <FlatList
           refreshControl={
@@ -56,7 +59,6 @@ export function Home({navigation}) {
             dispatch(getDrivers(offset));
           }}
           onEndReachedThreshold={0.1}
-          ListEmptyComponent={<EmptyContent />}
           ListFooterComponent={() => (isLoading ? <Loader /> : null)}
         />
       )}
